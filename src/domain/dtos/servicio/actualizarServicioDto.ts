@@ -3,10 +3,10 @@ export class ActualizarServicioDto{
         public servicio?: string,
         public usuario?: string,
         public contrasenia?: string,
-        public borrado: boolean
+        public borrado?: boolean
     ){}
 
-    static create( object: {[key: string]: any}): [string?, ActualizarServicioDto?]{
+    static create( object: {[key: string]: any}): [string | undefined, ActualizarServicioDto | undefined]{
 
         const { servicio, usuario, contrasenia, borrado } = object
 

@@ -6,7 +6,7 @@ export class CrearServicioDto{
         public borrado: boolean
     ){}
 
-    static create( object: {[key: string]: any}): [string?, CrearServicioDto?]{
+    static create( object: {[key: string]: any}): [string | undefined, CrearServicioDto | undefined]{
 
         const { servicio, usuario, contrasenia, borrado } = object
 

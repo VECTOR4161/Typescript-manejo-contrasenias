@@ -18,4 +18,5 @@ export class ServicioDatasourcePrismaImpl implements ServicioDatasource{
     obtenerServicios(paginacionDto: PaginacionDto): Promise<Servicio[]> {
         throw new Error("Method not implemented.");
     }
+   
 }

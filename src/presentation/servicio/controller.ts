@@ -1,6 +1,16 @@
 import { Request, Response } from "express"
-import { ActualizarServicio, ActualizarServicioDto, CrearServicio, CrearServicioDto, CustomError, EliminarServicio, ObtenerServicio, ObtenerServicios, ServicioRepository } from "../../domain";
 import { PaginacionDto } from "../../common";
+import { 
+    ActualizarServicio, 
+    ActualizarServicioDto, 
+    CrearServicio, 
+    CrearServicioDto, 
+    CustomError, 
+    EliminarServicio, 
+    ObtenerServicio, 
+    ObtenerServicios, 
+    ServicioRepository 
+} from "../../domain";
 
 export class ServicioController{
     constructor(
@@ -61,6 +71,6 @@ export class ServicioController{
             .execute(Number(req.params.id))
             .then(data => res.json(data))
             .catch(error => this.handleError(error, res))
-            
+
     } 
 }
