@@ -6,3 +6,5 @@ export * from './dtos/servicio/crearServicioDto'
 export * from './datasources/servicio.datasource'
 export * from './repositories/servicio.repository'
 
+export * from './errors/custom.error'
+
