@@ -1,4 +1,5 @@
-import { CrearServicio, CrearServicioDto } from '../domain';
+import { PaginacionDto } from '../common';
+import { CrearServicio, CrearServicioDto, CustomError, EliminarServicio, ObtenerServicios } from '../domain';
 import { ServicioDatasourcePrismaImpl, ServicioRepositoryImpl } from '../infrastructure';
 import { pregunta, pausar } from '../utils/console';
 import { VistaBase } from './vistaBase';
@@ -44,11 +45,11 @@ export class Servicios extends VistaBase {
   private async crearContrasenia(): Promise<void> {
     try {
       console.log('\n🔷 CREAR NUEVA CONTRASEÑA');
-      const servicio = await pregunta('Ingresa el nombre del usuario: ');
+      const servicio = await pregunta('Ingresa el nombre del servicio: ');
       const usuario = await pregunta('Ingresa el email del usuario: ');
-      const contrasenia = await pregunta('Ingresa el email del usuario: ');
+      const contrasenia = await pregunta('Ingresa la contraseña: ');
 
-      const [error, crearServicioDto] = CrearServicioDto.create({ servicio, usuario, contrasenia })
+      const [error, crearServicioDto] = CrearServicioDto.create({ servicio, usuario, contrasenia, borrado: false })
       if (error) console.log(error)
 
       new CrearServicio(this.servicioRepositoryImpl)
@@ -64,22 +65,25 @@ export class Servicios extends VistaBase {
   }
 
   private async listarContrasenias(): Promise<void> {
-    console.log('\n🔷 LISTA DE CONTRASEÑAS');
-    console.log('1. Juan Pérez - juan@email.com');
-    console.log('2. María García - maria@email.com');
-    console.log('3. Carlos López - carlos@email.com');
-    console.log('4. Ana Martínez - ana@email.com');
-    console.log('5. Pedro Rodríguez - pedro@email.com');
+    let serviciosArray: string[] = [] 
+    const [, paginacionDto] = PaginacionDto.create({})
+    const serviciosRaw = await new ObtenerServicios(this.servicioRepositoryImpl).execute(paginacionDto!)
+    serviciosRaw.forEach(servicio => serviciosArray.push(`ID:  ${servicio.id}     Servicio:    ${servicio.servicio}            Correo: ${servicio.usuario}        Contraseña:     ${servicio.contrasenia}`))
+    this.mostrarEncabezado("Contraseñas Guardadas", serviciosArray)
     await pausar();
   }
 
   private async eliminarContrasenia(): Promise<void> {
     console.log('\n🔷 ELIMINAR CONTRASEÑA');
-    const usuario = await pregunta('Ingresa el nombre del usuario a eliminar: ');
-    const confirmacion = await pregunta(`¿Estás seguro de eliminar a "${usuario}"? (s/n): `);
+    const identificador = await pregunta('Ingresa el identificador de la contraseña a eliminar: ');
+    const confirmacion = await pregunta(`¿Estás seguro de eliminar la contraseña con el identificador "${identificador}"? (s/n): `);
 
     if (confirmacion.toLowerCase() === 's' || confirmacion.toLowerCase() === 'si') {
-      console.log(`\n✅ Usuario "${usuario}" eliminado exitosamente.`);
+      const bandera = await new EliminarServicio(this.servicioRepositoryImpl).execute(Number(identificador))
+      if(bandera)
+      console.log(`\n✅ Contraseña "${identificador}" eliminado exitosamente.`);
+      else
+      console.log(`\n✅ Error al eliminar al contraseña`);
     } else {
       console.log('\n❌ Operación cancelada.');
     }

@@ -1,17 +1,31 @@
 import { Servicio, ServicioRepository } from "../..";
-import { PaginacionDto } from "../../../common";
+import { CryptoAdapter, PaginacionDto } from "../../../common";
 
-interface ObtenerServiciosUsecase{
+interface ObtenerServiciosUsecase {
     execute(paginacionDto: PaginacionDto): Promise<Servicio[]>
 }
 
-export class ObtenerServicios implements ObtenerServiciosUsecase{
+export class ObtenerServicios implements ObtenerServiciosUsecase {
 
     constructor(
         private readonly servicioRepository: ServicioRepository
-    ){}
+    ) { }
 
-    execute(paginacionDto: PaginacionDto): Promise<Servicio[]> {
-        return this.servicioRepository.obtenerServicios(paginacionDto)
+    async execute(paginacionDto: PaginacionDto): Promise<Servicio[]> {
+        const servicios = await this.servicioRepository.obtenerServicios(paginacionDto)
+        const cifrador = new CryptoAdapter()
+
+        // Usamos Promise.all para resolver todas las promesas del map
+        const serviciosDescifrados = await Promise.all(
+            servicios.map(async (servicio) => ({
+                id: servicio.id, // si quieres mantener el id u otras props
+                contrasenia: await cifrador.decrypt(servicio.contrasenia),
+                usuario: await cifrador.decrypt(servicio.usuario),
+                servicio: await cifrador.decrypt(servicio.servicio),
+                borrado: servicio.borrado, // ejemplo de conservar campos no cifrados
+            }))
+        )
+
+        return serviciosDescifrados
     }
 }

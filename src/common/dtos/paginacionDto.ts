@@ -4,7 +4,7 @@ export class PaginacionDto{
         public rows: number
     ){}
 
-    static create(object: {[key: string]: any}): [string?, PaginacionDto?]
+    static create(object: {[key: string]: any}): [string | undefined, PaginacionDto | undefined]
     {
         let { first, rows } = object
 
