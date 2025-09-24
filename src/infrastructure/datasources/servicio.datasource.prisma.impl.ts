@@ -6,7 +6,7 @@ export class ServicioDatasourcePrismaImpl implements ServicioDatasource{
     crearServicio(crearServicioDto: CrearServicioDto): Promise<Servicio> {
         throw new Error("Method not implemented.");
     }
-    actualizarServicio(actualizarServicioDto: ActualizarServicioDto): Promise<Servicio> {
+    actualizarServicio(idServicio: number, actualizarServicioDto: ActualizarServicioDto): Promise<Servicio> {
         throw new Error("Method not implemented.");
     }
     eliminarServicio(idServicio: number): Promise<boolean> {

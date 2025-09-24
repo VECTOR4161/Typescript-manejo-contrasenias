@@ -1,21 +1,26 @@
 import { PaginacionDto } from "../../common";
-import { ActualizarServicioDto, CrearServicioDto, Servicio, ServicioRepository } from "../../domain";
+import { ActualizarServicioDto, CrearServicioDto, Servicio, ServicioDatasource, ServicioRepository } from "../../domain";
 
 export class ServicioRepositoryImpl implements ServicioRepository{
+
+    constructor(
+        private readonly servicioDatasource: ServicioDatasource
+    ){}
+
     crearServicio(crearServicioDto: CrearServicioDto): Promise<Servicio> {
-        throw new Error("Method not implemented.");
+        return this.servicioDatasource.crearServicio(crearServicioDto)
     }
-    actualizarServicio(actualizarServicioDto: ActualizarServicioDto): Promise<Servicio> {
-        throw new Error("Method not implemented.");
+    actualizarServicio(idServicio: number, actualizarServicioDto: ActualizarServicioDto): Promise<Servicio> {
+        return this.servicioDatasource.actualizarServicio(idServicio ,actualizarServicioDto)
     }
     eliminarServicio(idServicio: number): Promise<boolean> {
-        throw new Error("Method not implemented.");
+        return this.servicioDatasource.eliminarServicio(idServicio)
     }
     obtenerServicio(idServicio: number): Promise<Servicio> {
-        throw new Error("Method not implemented.");
+        return this.servicioDatasource.obtenerServicio(idServicio)
     }
     obtenerServicios(paginacionDto: PaginacionDto): Promise<Servicio[]> {
-        throw new Error("Method not implemented.");
+        return this.servicioDatasource.obtenerServicios(paginacionDto)
     }
 
 }
