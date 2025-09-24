@@ -1,5 +1,5 @@
 import { PaginacionDto } from '../common';
-import { CrearServicio, CrearServicioDto, CustomError, EliminarServicio, ObtenerServicios } from '../domain';
+import { ActualizarServicio, ActualizarServicioDto, CrearServicio, CrearServicioDto, CustomError, EliminarServicio, ObtenerServicio, ObtenerServicios } from '../domain';
 import { ServicioDatasourcePrismaImpl, ServicioRepositoryImpl } from '../infrastructure';
 import { pregunta, pausar } from '../utils/console';
 import { VistaBase } from './vistaBase';
@@ -16,13 +16,15 @@ export class Servicios extends VistaBase {
     const opciones = [
       '1. Guardar Nueva Contraseña',
       '2. Listar Contraseñas',
-      '3. Eliminar Contraseñas'
+      '3. Eliminar Contraseñas',
+      '4. Actualizar Contraseñas',
+      '5. Buscar Contraseña'
     ];
 
     this.mostrarEncabezado('GESTIÓN DE CONTRASEÑAS', opciones);
     console.log('\n0. Salir de la aplicacion');
 
-    const opcion = await pregunta('\nSelecciona una opción (0-3): ');
+    const opcion = await pregunta('\nSelecciona una opción (0-5): ');
 
     switch (opcion) {
       case '1':
@@ -33,6 +35,12 @@ export class Servicios extends VistaBase {
         return 'servicios';
       case '3':
         await this.eliminarContrasenia();
+        return 'servicios';
+      case '4':
+        await this.actualizarContrasenia();
+        return 'servicios';
+      case '5':
+        await this.obtenerContrasenia();
         return 'servicios';
       case '0':
         return 'salir';
@@ -55,7 +63,7 @@ export class Servicios extends VistaBase {
       new CrearServicio(this.servicioRepositoryImpl)
         .execute(crearServicioDto!)
         .then(data => console.log(`\n✅ Servicio "${servicio}" creado exitosamente.`))
-        .catch(error => console.log(error))
+        .catch(error => console.log('Error al crear la contraseña'))
 
       await pausar();
     } catch (error) {
@@ -81,12 +89,52 @@ export class Servicios extends VistaBase {
     if (confirmacion.toLowerCase() === 's' || confirmacion.toLowerCase() === 'si') {
       const bandera = await new EliminarServicio(this.servicioRepositoryImpl).execute(Number(identificador))
       if(bandera)
-      console.log(`\n✅ Contraseña "${identificador}" eliminado exitosamente.`);
+      console.log(`\nContraseña "${identificador}" eliminado exitosamente.`);
       else
-      console.log(`\n✅ Error al eliminar al contraseña`);
+      console.log(`\nError al eliminar al contraseña`);
     } else {
-      console.log('\n❌ Operación cancelada.');
+      console.log('\nOperación cancelada.');
     }
     await pausar();
+  }
+
+  private async actualizarContrasenia(): Promise<void> {
+    try {
+      console.log('\n🔷 ACTUALIZAR CONTRASEÑA');
+      const identificador = await pregunta('Ingresa el identificador de la contraseña a modificar: ');
+      const servicio = await pregunta('Ingresa el nombre del servicio: ');
+      const usuario = await pregunta('Ingresa el email del usuario: ');
+      const contrasenia = await pregunta('Ingresa la contraseña: ');
+
+      const [error, crearServicioDto] = ActualizarServicioDto.create({ servicio, usuario, contrasenia, borrado: false })
+      if (error) console.log(error)
+
+      new ActualizarServicio(this.servicioRepositoryImpl)
+        .execute(Number(identificador) ,crearServicioDto!)
+        .then(data => console.log(`\n✅ Servicio "${servicio}" actualizado exitosamente.`))
+        .catch(error => console.log('Error al actualizar la contraseña'))
+
+      await pausar();
+    } catch (error) {
+      console.log('Error al actualizar la contraseña')
+      await pausar();
+    }
+  }
+
+  private async obtenerContrasenia(): Promise<void> {
+    try {
+      console.log('\n🔷 OBTENER CONTRASEÑA');
+      const identificador = await pregunta('Ingresa el identificador de la contraseña a buscar: ');
+
+      new ObtenerServicio(this.servicioRepositoryImpl)
+        .execute(Number(identificador))
+        .then(data => this.mostrarEncabezado('Contraseña', [`ID:  ${data.id}     Servicio:    ${data.servicio}            Correo: ${data.usuario}        Contraseña:     ${data.contrasenia}`]))
+        .catch(error => console.log('Error al obtener la contraseña'))
+
+      await pausar();
+    } catch (error) {
+      console.log('Error al actualizar la contraseña')
+      await pausar();
+    }
   }
 }
