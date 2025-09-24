@@ -2,17 +2,19 @@ export class ActualizarServicioDto{
     private constructor(
         public servicio?: string,
         public usuario?: string,
-        public contrasenia?: string
+        public contrasenia?: string,
+        public borrado: boolean
     ){}
 
     static create( object: {[key: string]: any}): [string?, ActualizarServicioDto?]{
 
-        const { servicio, usuario, contrasenia } = object
+        const { servicio, usuario, contrasenia, borrado } = object
 
         return [undefined, new ActualizarServicioDto(
             servicio,
             usuario,
-            contrasenia
+            contrasenia,
+            borrado
         )];
     }
 }

@@ -3,6 +3,7 @@ export class Servicio{
         public id: number,
         public servicio: string,
         public usuario: string,
-        public contrasenia: string
+        public contrasenia: string,
+        public borrado: boolean
     ){}
 }
