@@ -15,14 +15,13 @@ export class ObtenerServicios implements ObtenerServiciosUsecase {
         const servicios = await this.servicioRepository.obtenerServicios(paginacionDto)
         const cifrador = new CryptoAdapter()
 
-        // Usamos Promise.all para resolver todas las promesas del map
         const serviciosDescifrados = await Promise.all(
             servicios.map(async (servicio) => ({
-                id: servicio.id, // si quieres mantener el id u otras props
+                id: servicio.id, 
                 contrasenia: await cifrador.decrypt(servicio.contrasenia),
                 usuario: await cifrador.decrypt(servicio.usuario),
                 servicio: await cifrador.decrypt(servicio.servicio),
-                borrado: servicio.borrado, // ejemplo de conservar campos no cifrados
+                borrado: servicio.borrado, 
             }))
         )
 

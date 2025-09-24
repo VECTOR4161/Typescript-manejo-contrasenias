@@ -1,4 +1,4 @@
-import { PaginacionDto } from "../../common";
+import { filtradorDeObjetos, PaginacionDto } from "../../common";
 import { PrismaAdapter } from "../../data";
 import { ActualizarServicioDto, CrearServicioDto, CustomError, Servicio, ServicioDatasource } from "../../domain";
 
@@ -16,13 +16,24 @@ export class ServicioDatasourcePrismaImpl implements ServicioDatasource{
             throw CustomError.internalServer('Error al insertar el registro')
         }
     }
-    actualizarServicio(idServicio: number, actualizarServicioDto: ActualizarServicioDto): Promise<Servicio> {
-        throw new Error("Method not implemented.");
-    }
-    async eliminarServicio(idServicio: number): Promise<boolean> {
+    async actualizarServicio(idServicio: number, actualizarServicioDto: ActualizarServicioDto): Promise<Servicio> {
         try {
             const prisma = PrismaAdapter.crearConexion()
             const servicio = await prisma.servicio.update({
+                data: filtradorDeObjetos.filtrarDto(actualizarServicioDto),
+                where: {id: idServicio}
+            })
+            return servicio
+        } catch (error) {
+            if( error instanceof CustomError) throw CustomError.customizableError(error.statusCode, error.message)
+            throw CustomError.internalServer('Error al actualizar el servicio')
+        }
+    }
+
+    async eliminarServicio(idServicio: number): Promise<boolean> {
+        try {
+            const prisma = PrismaAdapter.crearConexion()
+            await prisma.servicio.update({
                 data: {borrado: true},
                 where: {id: idServicio}
             })
@@ -31,9 +42,24 @@ export class ServicioDatasourcePrismaImpl implements ServicioDatasource{
             return false
         }
     }
-    obtenerServicio(idServicio: number): Promise<Servicio> {
-        throw new Error("Method not implemented.");
+
+
+    async obtenerServicio(idServicio: number): Promise<Servicio> {
+        try {
+            const prisma = PrismaAdapter.crearConexion()
+            const servicio = await prisma.servicio.findFirst({
+                where: {id: idServicio}
+            })
+            if(!servicio) throw CustomError.internalServer('Error al obtener el servicio')
+            return servicio
+        } catch (error) {
+            if( error instanceof CustomError) throw CustomError.customizableError(error.statusCode, error.message)
+            throw CustomError.internalServer('Error al obtener el servicio')
+        }
     }
+
+
+
     async obtenerServicios(paginacionDto: PaginacionDto): Promise<Servicio[]> {
         const prisma = PrismaAdapter.crearConexion()
         return prisma.servicio.findMany({
