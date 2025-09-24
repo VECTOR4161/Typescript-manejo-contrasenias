@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
-import { CustomError, ServicioRepository } from "../../domain";
+import { ActualizarServicio, ActualizarServicioDto, CrearServicio, CrearServicioDto, CustomError, EliminarServicio, ObtenerServicio, ObtenerServicios, ServicioRepository } from "../../domain";
+import { PaginacionDto } from "../../common";
 
 export class ServicioController{
     constructor(
@@ -12,9 +13,54 @@ export class ServicioController{
         }
     }
 
-    registrarServicio = (req: Request, res: Response) => {}
-    obtenerServicios = (req: Request, res: Response) => {}
-    obtenerServicio = (req: Request, res: Response) => {}
-    actualizarServicio = (req: Request, res: Response) => {} 
-    eliminarServicio = (req: Request, res: Response) => {} 
+    crearServicio = (req: Request, res: Response) => {
+
+        const [error, crearServicioDto] = CrearServicioDto.create(req.body)
+        if( error ) { return res.status(502).json({ error }) }
+
+        new CrearServicio(this.servicioRepository)
+            .execute(crearServicioDto!)
+            .then( data => res.json( data ))
+            .catch( error => this.handleError(error, res))
+
+    }
+
+    obtenerServicios = (req: Request, res: Response) => {
+
+        const [, paginacionDto] = PaginacionDto.create(req.body)
+
+        new ObtenerServicios(this.servicioRepository)
+            .execute(paginacionDto!)
+            .then(data => res.json(data))
+            .catch(error => this.handleError(error, res))
+
+    }
+
+    obtenerServicio = (req: Request, res: Response) => {
+
+        new ObtenerServicio(this.servicioRepository)
+            .execute(Number(req.params.id))
+            .then(data => res.json(data))
+            .catch(error => this.handleError(error, res))
+
+    }
+
+    actualizarServicio = (req: Request, res: Response) => {
+
+        const [error, actualizarServicioDto] = ActualizarServicioDto.create(req.body)
+        if( error ) { return res.status(502).json({ error }) }
+
+        new ActualizarServicio(this.servicioRepository)
+            .execute(Number(req.params.id), actualizarServicioDto!)
+            .catch(error => this.handleError(error, res))
+
+    } 
+    eliminarServicio = (req: Request, res: Response) => {
+
+        new EliminarServicio(this.servicioRepository)
+            .execute(Number(req.params.id))
+            .then(data => res.json(data))
+            .catch(error => this.handleError(error, res))
+            
+    } 
 }
