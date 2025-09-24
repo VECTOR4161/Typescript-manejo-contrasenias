@@ -1,7 +1,7 @@
 import { ActualizarServicioDto, CrearServicioDto, Servicio } from "..";
 import { PaginacionDto } from "../../common";
 
-abstract class ServicioDatasource{
+export abstract class ServicioDatasource{
     abstract crearServicio(crearServicioDto: CrearServicioDto): Promise<Servicio>
     abstract actualizarServicio(actualizarServicioDto: ActualizarServicioDto): Promise<Servicio>
     abstract eliminarServicio(idServicio: number): Promise<boolean>
